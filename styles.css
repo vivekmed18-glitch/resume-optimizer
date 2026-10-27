@@ -573,6 +573,8 @@ textarea {
   position: relative;
   width: var(--resume-page-width);
   min-height: var(--resume-page-height);
+  height: auto;
+  flex-shrink: 0;
   background-color: white;
   color: black;
   box-shadow: var(--shadow-lg);
@@ -620,6 +622,9 @@ textarea {
   line-height: 1.4;
   color: #333333;
   text-align: left;
+  background-color: white;
+  border-radius: var(--radius-sm);
+  min-height: inherit;
 }
 
 .resume-sheet-header {
@@ -1023,6 +1028,8 @@ textarea {
   .resume-sheet-container {
     transform: scale(0.7);
     transform-origin: top center;
+    flex-shrink: 0;
+    height: auto;
   }
 }
 
@@ -1043,6 +1050,8 @@ textarea {
   .resume-sheet-container {
     transform: scale(0.5);
     margin-bottom: 10px;
+    flex-shrink: 0;
+    height: auto;
   }
   
   .preview-controls-row {
