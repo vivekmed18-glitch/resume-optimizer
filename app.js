@@ -3238,7 +3238,7 @@ function initRawTextImportActions() {
         return state;
       });
 
-      populateFormFromState();
+      renderFromState();
       renderPreviewResumeSheet();
       persistStateToStorage();
       showToast(useGemini
@@ -3736,33 +3736,33 @@ function initUploadActions() {
       const isMerge = document.querySelector('input[name="import-strategy"]:checked').value === "merge";
 
       // 1. Extract contact data from review fields
-      if (document.getElementById("chk-import-contact").checked) {
-        appState.resume.contact.fullName = document.getElementById("rev-contact-name").value.trim();
-        appState.resume.contact.headline = document.getElementById("rev-contact-headline").value.trim();
-        appState.resume.contact.email = document.getElementById("rev-contact-email").value.trim();
-        appState.resume.contact.phone = document.getElementById("rev-contact-phone").value.trim();
-        appState.resume.contact.location = document.getElementById("rev-contact-location").value.trim();
-        appState.resume.contact.linkedin = document.getElementById("rev-contact-linkedin").value.trim();
-        appState.resume.contact.portfolio = document.getElementById("rev-contact-portfolio").value.trim();
+      if (document.getElementById("chk-import-contact")?.checked) {
+        appState.resume.contact.fullName = document.getElementById("rev-contact-name")?.value?.trim() || "";
+        appState.resume.contact.headline = document.getElementById("rev-contact-headline")?.value?.trim() || "";
+        appState.resume.contact.email = document.getElementById("rev-contact-email")?.value?.trim() || "";
+        appState.resume.contact.phone = document.getElementById("rev-contact-phone")?.value?.trim() || "";
+        appState.resume.contact.location = document.getElementById("rev-contact-location")?.value?.trim() || "";
+        appState.resume.contact.linkedin = document.getElementById("rev-contact-linkedin")?.value?.trim() || "";
+        appState.resume.contact.portfolio = document.getElementById("rev-contact-portfolio")?.value?.trim() || "";
         console.log("[Import Debug] Contact read from dialog:", JSON.parse(JSON.stringify(appState.resume.contact)));
       }
 
       // 2. Summary
-      if (document.getElementById("chk-import-summary").checked) {
-        appState.resume.summary = document.getElementById("preview-import-summary").value.trim();
+      if (document.getElementById("chk-import-summary")?.checked) {
+        appState.resume.summary = document.getElementById("preview-import-summary")?.value?.trim() || "";
       }
 
       // 3. Experience
-      if (document.getElementById("chk-import-experience").checked) {
+      if (document.getElementById("chk-import-experience")?.checked) {
         const importedJobs = [];
         const companyInputs = reviewDialog.querySelectorAll(".rev-exp-company");
         
         companyInputs.forEach(compIn => {
           const idx = compIn.dataset.idx;
           const company = compIn.value.trim();
-          const title = reviewDialog.querySelector(`.rev-exp-title[data-idx="${idx}"]`).value.trim();
-          const rawDates = reviewDialog.querySelector(`.rev-exp-dates[data-idx="${idx}"]`).value.trim();
-          const rawBullets = reviewDialog.querySelector(`.rev-exp-bullets[data-idx="${idx}"]`).value.trim();
+          const title = reviewDialog.querySelector(`.rev-exp-title[data-idx="${idx}"]`)?.value?.trim() || "";
+          const rawDates = reviewDialog.querySelector(`.rev-exp-dates[data-idx="${idx}"]`)?.value?.trim() || "";
+          const rawBullets = reviewDialog.querySelector(`.rev-exp-bullets[data-idx="${idx}"]`)?.value?.trim() || "";
 
           let startDate = "";
           let endDate = "";
@@ -3806,15 +3806,15 @@ function initUploadActions() {
       }
 
       // 4. Education
-      if (document.getElementById("chk-import-education").checked) {
+      if (document.getElementById("chk-import-education")?.checked) {
         const importedSchools = [];
         const schoolInputs = reviewDialog.querySelectorAll(".rev-edu-school");
 
         schoolInputs.forEach(schoolIn => {
           const idx = schoolIn.dataset.idx;
           const school = schoolIn.value.trim();
-          const degree = reviewDialog.querySelector(`.rev-edu-degree[data-idx="${idx}"]`).value.trim();
-          const gradDate = reviewDialog.querySelector(`.rev-edu-date[data-idx="${idx}"]`).value.trim();
+          const degree = reviewDialog.querySelector(`.rev-edu-degree[data-idx="${idx}"]`)?.value?.trim() || "";
+          const gradDate = reviewDialog.querySelector(`.rev-edu-date[data-idx="${idx}"]`)?.value?.trim() || "";
 
           importedSchools.push({
             id: generateUUID(),
@@ -3841,9 +3841,11 @@ function initUploadActions() {
       }
 
       // 5. Skills
-      if (document.getElementById("chk-import-skills").checked) {
-        const importedTech = document.getElementById("preview-import-skills-tech").value.split(",").map(s => s.trim()).filter(Boolean);
-        const importedTools = document.getElementById("preview-import-skills-tools").value.split(",").map(s => s.trim()).filter(Boolean);
+      if (document.getElementById("chk-import-skills")?.checked) {
+        const techInput = document.getElementById("preview-import-skills-tech");
+        const toolsInput = document.getElementById("preview-import-skills-tools");
+        const importedTech = techInput ? techInput.value.split(",").map(s => s.trim()).filter(Boolean) : [];
+        const importedTools = toolsInput ? toolsInput.value.split(",").map(s => s.trim()).filter(Boolean) : [];
 
         if (isMerge) {
           const currentTech = appState.resume.skills.technical.map(s => s.toLowerCase());
@@ -3866,27 +3868,29 @@ function initUploadActions() {
       }
 
       // 6. Vault Items
-      if (document.getElementById("chk-import-vault").checked) {
+      if (document.getElementById("chk-import-vault")?.checked) {
         const vaultItems = [];
         const vaultChecks = reviewDialog.querySelectorAll(".rev-vault-item");
 
         vaultChecks.forEach(chk => {
           if (chk.checked) {
             const idx = chk.dataset.idx;
-            const cert = data.vaultItems[idx];
-            vaultItems.push({
-              id: generateUUID(),
-              type: cert.type || "certification",
-              name: cert.name,
-              issuer: cert.issuer,
-              date: cert.date,
-              expirationDate: cert.expirationDate || "",
-              credentialUrl: cert.credentialUrl || "",
-              description: cert.description || "",
-              aliases: cert.aliases || [],
-              keywords: cert.keywords || [],
-              active: true
-            });
+            const cert = (data.vaultItems && data.vaultItems[idx]) || {};
+            if (cert.name) {
+              vaultItems.push({
+                id: generateUUID(),
+                type: cert.type || "certification",
+                name: cert.name,
+                issuer: cert.issuer || "",
+                date: cert.date || "",
+                expirationDate: cert.expirationDate || "",
+                credentialUrl: cert.credentialUrl || "",
+                description: cert.description || "",
+                aliases: cert.aliases || [],
+                keywords: cert.keywords || [],
+                active: true
+              });
+            }
           }
         });
 
@@ -3913,7 +3917,7 @@ function initUploadActions() {
       undoBanner.style.display = "flex";
       
       persistStateToStorage();
-      populateFormFromState();
+      renderFromState();
       renderPreviewResumeSheet();
       runLocalDeterministicAnalysis();
       showToast("Resume details imported successfully!");
