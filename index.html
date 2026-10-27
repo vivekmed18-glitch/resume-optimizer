@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume.AI - Resume Builder & Recruiter/ATS Analyzer</title>
+  <meta name="description" content="Optimize your resume using a deterministic ATS compatibility score and simulated recruiter heatmap reviews.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="print-letter">
+
+  <!-- Main App Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <svg class="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <h1 class="logo-title">Resume.AI</h1>
+      </div>
+      
+      <nav class="header-actions" aria-label="Global controls">
+        <button id="btn-run-demo" class="btn btn-secondary" type="button">
+          Run Offline Demo
+        </button>
+        <button id="btn-run-live" class="btn btn-primary" type="button">
+          Send Resume & Analyze
+        </button>
+        <button id="btn-print" class="btn btn-icon" type="button" aria-label="Print or Save PDF">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+        </button>
+        <button id="btn-settings" class="btn btn-icon" type="button" aria-label="Open settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Bottom Tab Navigation -->
+  <nav class="mobile-nav-tabs" aria-label="Mobile Navigation">
+    <button id="mobile-tab-editor" class="mobile-nav-btn active" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+        <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path>
+      </svg>
+      <span>Editor</span>
+    </button>
+    <button id="mobile-tab-preview" class="mobile-nav-btn" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+      </svg>
+      <span>Preview</span>
+    </button>
+    <button id="mobile-tab-insights" class="mobile-nav-btn" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"></line>
+        <line x1="12" y1="20" x2="12" y2="4"></line>
+        <line x1="6" y1="20" x2="6" y2="14"></line>
+      </svg>
+      <span>Insights</span>
+    </button>
+  </nav>
+
+  <!-- Main Content Grid -->
+  <main class="app-main-grid">
+    
+    <!-- LEFT PANEL: Editor Forms -->
+    <section class="panel-section editor-panel" aria-label="Resume Inputs and Setup">
+      <div class="panel-tabs-header" role="tablist" aria-label="Editor sections">
+        <button id="tab-builder" class="panel-tab active" role="tab" aria-selected="true" aria-controls="panel-builder" tabindex="0" type="button">
+          Resume Builder
+        </button>
+        <button id="tab-vault" class="panel-tab" role="tab" aria-selected="false" aria-controls="panel-vault" tabindex="-1" type="button">
+          Achievements Vault
+        </button>
+        <button id="tab-jd" class="panel-tab" role="tab" aria-selected="false" aria-controls="panel-jd" tabindex="-1" type="button">
+          Job Description
+        </button>
+        <button id="tab-tracker" class="panel-tab" role="tab" aria-selected="false" aria-controls="panel-tracker" tabindex="-1" type="button">
+          Application Tracker
+        </button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="panel-body">
+        
+        <!-- Tab 1: Builder Form -->
+        <div id="panel-builder" class="tab-panel-content active" role="tabpanel" aria-labelledby="tab-builder">
+          <div class="form-scroll-wrapper">
+            <!-- Undo Import Alert Banner -->
+            <div id="undo-import-banner" style="display: none; background-color: var(--primary); border: 1px solid var(--primary-light); border-radius: 6px; padding: 10px 16px; margin: 0 0 20px 0; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <span style="font-size: 0.85rem; color: #fff; font-weight: 500;">Resume imported successfully. You can revert back to your previous builder data if needed.</span>
+              <button id="btn-undo-import" class="btn btn-secondary btn-sm" type="button" style="background-color: var(--background); border-color: var(--border);">Undo Import</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h2 class="section-title" style="margin: 0;">Resume Builder</h2>
+              <button id="btn-import-text-trigger" class="btn btn-secondary btn-sm" type="button" style="font-size: 0.8rem; padding: 6px 12px;">Import Existing Resume</button>
+            </div>
+
+            <!-- Upload Existing Resume Header Banner -->
+            <div class="upload-widget-card" style="background-color: var(--card-bg); border: 1px dashed var(--border); border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: center;">
+              <h3 style="margin-top: 0; font-size: 1rem; color: var(--primary-light); margin-bottom: 4px;">Upload Existing Resume</h3>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
+                Import a PDF, DOCX, or TXT resume. Your existing builder data will not be replaced until you review and confirm the import.
+              </p>
+              <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                <button id="btn-upload-resume-trigger" class="btn btn-primary btn-sm" type="button" style="display: inline-flex; align-items: center; gap: 6px;">
+                  Upload Existing Resume
+                </button>
+                <button id="btn-scrape-github-trigger" class="btn btn-secondary btn-sm" type="button" style="display: inline-flex; align-items: center; gap: 6px;">
+                  🌐 Import GitHub Competencies
+                </button>
+              </div>
+            </div>
+            
+            <!-- Contact Section -->
+            <fieldset class="form-fieldset">
+              <legend class="fieldset-legend">Contact Information</legend>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="contact-name">Full Name</label>
+                  <input type="text" id="contact-name" placeholder="John Doe" value="John Doe">
+                </div>
+                <div class="form-group">
+                  <label for="contact-headline">Professional Headline</label>
+                  <input type="text" id="contact-headline" placeholder="Software Engineer" value="Software Engineer">
+                </div>
+                <div class="form-group">
+                  <label for="contact-email">Email Address</label>
+                  <input type="email" id="contact-email" placeholder="john.doe@example.com" value="john.doe@example.com">
+                </div>
+                <div class="form-group">
+                  <label for="contact-phone">Phone Number</label>
+                  <input type="tel" id="contact-phone" placeholder="+1 (555) 019-2834" value="+1 (555) 019-2834">
+                </div>
+                <div class="form-group">
+                  <label for="contact-location">Location</label>
+                  <input type="text" id="contact-location" placeholder="San Francisco, CA" value="San Francisco, CA">
+                </div>
+                <div class="form-group">
+                  <label for="contact-linkedin">LinkedIn Profile (URL)</label>
+                  <input type="url" id="contact-linkedin" placeholder="https://linkedin.com/in/johndoe" value="https://linkedin.com/in/johndoe">
+                </div>
+                <div class="form-group full-width">
+                  <label for="contact-portfolio">Portfolio / Website (URL)</label>
+                  <input type="url" id="contact-portfolio" placeholder="https://johndoe.dev" value="https://johndoe.dev">
+                </div>
+              </div>
+            </fieldset>
+
+            <!-- Summary Section -->
+            <fieldset class="form-fieldset">
+              <legend class="fieldset-legend">Professional Summary</legend>
+              <div class="form-group">
+                <label for="summary-text" class="sr-only">Summary</label>
+                <textarea id="summary-text" rows="4" placeholder="Detail your core strengths, experience, and background here.">Experienced Software Engineer specializing in modern frontend architectures and high-performance client applications. Proven history of building responsive web applications.</textarea>
+              </div>
+            </fieldset>
+
+            <!-- Experience Section -->
+            <fieldset class="form-fieldset">
+              <legend class="fieldset-legend">Work Experience</legend>
+              <div id="experience-list-container">
+                <!-- Static Experience Entry -->
+                <div class="experience-card" data-id="exp-sample-1">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label>Company</label>
+                      <input type="text" value="Innovate Tech Solutions" class="exp-company">
+                    </div>
+                    <div class="form-group">
+                      <label>Job Title</label>
+                      <input type="text" value="Frontend Engineer" class="exp-title">
+                    </div>
+                    <div class="form-group">
+                      <label>Dates Worked</label>
+                      <input type="text" value="Jan 2024 - Present" class="exp-dates">
+                    </div>
+                    <div class="form-group">
+                      <label>Location</label>
+                      <input type="text" value="San Francisco, CA" class="exp-location">
+                    </div>
+                    <div class="form-group full-width">
+                      <label>Bullet Points</label>
+                      <div class="bullet-list-inputs">
+                        <div class="bullet-input-row" data-id="bullet-sample-1">
+                          <input type="text" value="Responsible for building application components." class="exp-bullet">
+                          <button class="btn btn-icon btn-danger btn-delete-bullet" type="button" aria-label="Delete bullet">×</button>
+                        </div>
+                        <div class="bullet-input-row" data-id="bullet-sample-2">
+                          <input type="text" value="Helped fix bugs in the frontend client application." class="exp-bullet">
+                          <button class="btn btn-icon btn-danger btn-delete-bullet" type="button" aria-label="Delete bullet">×</button>
+                        </div>
+                      </div>
+                      <button class="btn btn-secondary btn-sm btn-add-bullet" type="button" style="margin-top: 8px;">+ Add Bullet</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button id="btn-add-experience" class="btn btn-secondary" type="button" style="margin-top: 12px;">+ Add Work Experience</button>
+            </fieldset>
+
+            <!-- Education Section -->
+            <fieldset class="form-fieldset">
+              <legend class="fieldset-legend">Education</legend>
+              <div id="education-list-container">
+                <div class="education-card" data-id="edu-sample-1">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label>School</label>
+                      <input type="text" value="State University" class="edu-school">
+                    </div>
+                    <div class="form-group">
+                      <label>Degree & Major</label>
+                      <input type="text" value="Bachelor of Science in Computer Science" class="edu-degree">
+                    </div>
+                    <div class="form-group">
+                      <label>Graduation Date</label>
+                      <input type="text" value="May 2023" class="edu-date">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button id="btn-add-education" class="btn btn-secondary" type="button" style="margin-top: 12px;">+ Add Education</button>
+            </fieldset>
+
+            <!-- Skills Section -->
+            <fieldset class="form-fieldset">
+              <legend class="fieldset-legend">Skills</legend>
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label for="skills-technical">Technical Skills (Comma separated)</label>
+                  <input type="text" id="skills-technical" value="JavaScript, HTML, CSS, React">
+                </div>
+                <div class="form-group full-width">
+                  <label for="skills-tools">Developer Tools (Comma separated)</label>
+                  <input type="text" id="skills-tools" value="Git, VS Code, Webpack">
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+
+        <!-- Tab 2: Achievements Vault -->
+        <div id="panel-vault" class="tab-panel-content" role="tabpanel" aria-labelledby="tab-vault" style="display: none;">
+          <div class="form-scroll-wrapper">
+            <h2 class="section-title">Achievements & Certifications Vault</h2>
+            <p class="section-subtitle">Store your credentials and awards offline. Resume.AI will review the Job Description and suggest adding them only if relevant.</p>
+            
+            <div id="vault-list-container">
+              <!-- Static Vault Item -->
+              <div class="vault-card" data-id="vault-sample-1">
+                <div class="vault-header">
+                  <span class="badge badge-cert">Certification</span>
+                  <div class="vault-actions">
+                    <button class="btn btn-link btn-toggle-vault-active" type="button">Include on Resume</button>
+                    <button class="btn btn-icon btn-danger btn-delete-vault" type="button" aria-label="Delete item">×</button>
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" value="AWS Certified Solutions Architect" class="vault-name">
+                  </div>
+                  <div class="form-group">
+                    <label>Issuer / Org</label>
+                    <input type="text" value="Amazon Web Services" class="vault-issuer">
+                  </div>
+                  <div class="form-group">
+                    <label>Date Earned</label>
+                    <input type="text" value="Dec 2024" class="vault-date">
+                  </div>
+                  <div class="form-group">
+                    <label>Aliases (Comma separated)</label>
+                    <input type="text" value="AWS CSA, AWS Architect" class="vault-aliases">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <button id="btn-add-vault" class="btn btn-secondary" type="button" style="margin-top: 12px;">+ Add Vault Item</button>
+          </div>
+        </div>
+
+        <!-- Tab 3: Job Description -->
+        <div id="panel-jd" class="tab-panel-content" role="tabpanel" aria-labelledby="tab-jd" style="display: none;">
+          <div class="form-scroll-wrapper">
+            <h2 class="section-title">Target Job Description</h2>
+            <p class="section-subtitle">Paste the full job description you are targeting to run the 3-stage compatibility review.</p>
+            
+            <div class="form-group">
+              <label for="jd-text" class="sr-only">Job Description</label>
+              <textarea id="jd-text" class="jd-textarea" rows="15" placeholder="Looking for a Frontend Engineer experienced in JavaScript, CSS, and modern framework technologies..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Application Tracker (CRM View) -->
+        <div id="panel-tracker" class="tab-panel-content" role="tabpanel" aria-labelledby="tab-tracker" style="display: none;">
+          <div class="form-scroll-wrapper">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <div>
+                <h2 class="section-title" style="margin: 0;">Application Kanban Tracker</h2>
+                <p class="section-subtitle" style="margin: 4px 0 0 0;">Manage and track your active job applications across all stages.</p>
+              </div>
+              <button id="btn-add-tracker-item" class="btn btn-primary btn-sm" type="button">+ New Application</button>
+            </div>
+
+            <!-- Kanban Grid Container -->
+            <div id="tracker-kanban-board" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px;">
+              <!-- Dynamic Kanban Column Cards -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Preview / Review Screen -->
+    <section class="panel-section preview-panel" aria-label="Resume Output and AI Review">
+      <div class="panel-tabs-header" role="tablist" aria-label="Outputs">
+        <button id="tab-preview" class="panel-tab active" role="tab" aria-selected="true" aria-controls="panel-preview" tabindex="0" type="button">
+          Resume Preview
+        </button>
+        <button id="tab-review" class="panel-tab" role="tab" aria-selected="false" aria-controls="panel-review" tabindex="-1" type="button">
+          AI Review Insights
+        </button>
+        <button id="tab-coverletter" class="panel-tab" role="tab" aria-selected="false" aria-controls="panel-coverletter" tabindex="-1" type="button">
+          Cover Letter Studio
+        </button>
+        <button id="tab-interview" class="panel-tab" role="tab" aria-selected="false" aria-controls="panel-interview" tabindex="-1" type="button">
+          STAR Interview Prep
+        </button>
+      </div>
+
+      <!-- Preview Panel Content -->
+      <div class="panel-body">
+        
+        <!-- Live Resume Sheet (White sheet in dark container) -->
+        <div id="panel-preview" class="tab-panel-content active" role="tabpanel" aria-labelledby="tab-preview">
+          
+          <div class="preview-controls-row">
+            <div class="heatmap-toggle-wrapper">
+              <label class="switch-label" for="toggle-heatmap">
+                <input type="checkbox" id="toggle-heatmap">
+                <span class="switch-slider"></span>
+                <span>Simulated Recruiter Attention Map</span>
+              </label>
+              <span id="heatmap-sr-status" class="sr-only" aria-live="polite">Simulated Recruiter Attention Map is currently hidden.</span>
+              <div class="info-tooltip-container">
+                <button class="info-tooltip-trigger" type="button" aria-label="Map information">i</button>
+                <div class="info-tooltip-popup" role="tooltip">
+                  This visualization is an AI-generated attention estimate based on resume structure and content placement. It is not based on physical eye-tracking data.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="resume-sheet-container">
+            <!-- Simulated Attention Overlay (Hidden by default) -->
+            <div id="heatmap-overlay" class="heatmap-overlay" style="display: none;">
+              <div class="heatmap-bubble spot-1" style="top: 10%; left: 30%; width: 250px; height: 120px;"></div>
+              <div class="heatmap-bubble spot-2" style="top: 25%; left: 15%; width: 500px; height: 180px;"></div>
+              <div class="heatmap-bubble spot-3" style="top: 55%; left: 20%; width: 350px; height: 100px;"></div>
+            </div>
+            
+            <!-- Standard ATS Resume Layout -->
+            <article class="resume-sheet">
+              
+              <header class="resume-sheet-header">
+                <h2 id="preview-name" class="resume-title">John Doe</h2>
+                <p id="preview-headline" class="resume-subtitle">Software Engineer</p>
+                <div id="preview-contact-details" class="resume-contact">
+                  <span id="preview-email">john.doe@example.com</span> • 
+                  <span id="preview-phone">+1 (555) 019-2834</span> • 
+                  <span id="preview-location">San Francisco, CA</span>
+                </div>
+                <div class="resume-links">
+                  <a id="preview-linkedin" href="https://linkedin.com/in/johndoe" target="_blank" rel="noopener">LinkedIn</a>
+                  <a id="preview-portfolio" href="https://johndoe.dev" target="_blank" rel="noopener">Portfolio</a>
+                </div>
+              </header>
+
+              <section class="resume-section">
+                <h3>Professional Summary</h3>
+                <hr>
+                <p id="preview-summary">Experienced Software Engineer specializing in modern frontend architectures and high-performance client applications. Proven history of building responsive web applications.</p>
+              </section>
+
+              <section class="resume-section">
+                <h3>Work Experience</h3>
+                <hr>
+                <div id="preview-experience-container">
+                  <div class="preview-experience-item">
+                    <div class="item-header">
+                      <strong class="item-comp-title">Innovate Tech Solutions — Frontend Engineer</strong>
+                      <span class="item-meta">Jan 2024 - Present | San Francisco, CA</span>
+                    </div>
+                    <ul class="item-bullets">
+                      <li>Responsible for building application components.</li>
+                      <li>Helped fix bugs in the frontend client application.</li>
+                    </ul>
+                  </div>
+                </div>
+              </section>
+
+              <section class="resume-section">
+                <h3>Education</h3>
+                <hr>
+                <div id="preview-education-container">
+                  <div class="preview-education-item">
+                    <div class="item-header">
+                      <strong class="item-comp-title">State University</strong>
+                      <span class="item-meta">Bachelor of Science in Computer Science | May 2023</span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="resume-section">
+                <h3>Skills</h3>
+                <hr>
+                <div class="preview-skills-grid">
+                  <div><strong>Technical Skills:</strong> <span id="preview-skills-technical">JavaScript, HTML, CSS, React</span></div>
+                  <div><strong>Developer Tools:</strong> <span id="preview-skills-tools">Git, VS Code, Webpack</span></div>
+                  <div id="preview-skills-vault-row" style="display: none;">
+                    <strong>Certifications & Awards:</strong> <span id="preview-skills-vault-list"></span>
+                  </div>
+                </div>
+              </section>
+
+            </article>
+          </div>
+        </div>
+
+        <!-- AI Review Tab: Analysis Dashboard placeholders -->
+        <div id="panel-review" class="tab-panel-content" role="tabpanel" aria-labelledby="tab-review" style="display: none;">
+          <div class="review-scroll-wrapper">
+            
+            <!-- Default Empty State -->
+            <div id="review-empty-state" class="empty-state-card">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="empty-icon">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <h3>No Analysis Run Yet</h3>
+              <p>Configure your target Job Description and click "Run Offline Demo" or "Send Resume & Analyze" above to generate insights.</p>
+            </div>
+            
+            <!-- Loading State Card -->
+            <div id="review-loading-state" class="empty-state-card" style="display: none;">
+              <div class="loader-spinner" style="border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--primary-light); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 16px;"></div>
+              <h3>Analyzing Resume...</h3>
+              <p>Analyzing formatting criteria, matching credentials, and fetching AI review impressions.</p>
+              <button id="btn-cancel-analysis" class="btn btn-secondary btn-sm" type="button" style="margin-top: 16px;">Cancel Analysis</button>
+            </div>
+
+            <!-- Hidden Review Results Mock Frame -->
+            <div id="review-results-container" style="display: none;">
+              
+              <!-- ATS Score & Core Checklist -->
+              <div class="review-row-grid">
+                <div class="dashboard-card score-card">
+                  <h3 class="card-title">ATS Compatibility Estimate</h3>
+                  <div class="score-display">
+                    <span id="score-number-display" class="score-number">--</span>
+                    <span class="score-total">/100</span>
+                  </div>
+                  <div id="score-band-badge" class="badge" style="margin: 8px 0; font-size: 0.85rem; display: inline-block;">Needs Improvement</div>
+                  <p class="score-caption" style="font-size: 0.75rem; margin-top: 8px;">
+                    This estimate measures resume structure and alignment with the provided Job Description. It does not represent the scoring method of any specific ATS or guarantee an interview.
+                  </p>
+                </div>
+                
+                <div class="dashboard-card checklist-card">
+                  <h3 class="card-title">Formatting Checks</h3>
+                  <ul id="checklist-list-container" class="checklist-list">
+                    <!-- Dynamic Checklist items go here -->
+                  </ul>
+                </div>
+              </div>
+
+              <!-- ATS Categories Breakdown -->
+              <div class="dashboard-card">
+                <h3 class="card-title">ATS Category Breakdowns</h3>
+                <div id="ats-breakdown-details">
+                  <!-- Dynamic category scores & findings go here -->
+                </div>
+              </div>
+
+              <!-- 5-Dimensional Job Fit Breakdown (ai-job-search style) -->
+              <div class="dashboard-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <h3 class="card-title" style="margin-bottom: 0;">5-Dimensional Job Fit Analysis</h3>
+                  <span class="badge badge-cert" style="font-size: 0.75rem;">AI Fit Matrix</span>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">
+                  Evaluates alignment across key candidate evaluation pillars: Skills, Experience Level, Career Trajectory, Culture &amp; Work-Style, and Platform Tools.
+                </p>
+                <div id="fit-5d-container" style="display: flex; flex-direction: column; gap: 14px;">
+                  <!-- Dynamic 5D Fit Bars inserted by JS -->
+                </div>
+              </div>
+
+              <!-- Stage 2: Recruiter Review -->
+              <div class="dashboard-card">
+                <h3 class="card-title">Stage 2: Recruiter 7-Second Review</h3>
+                <div id="recruiter-review-findings">
+                  <!-- Dynamic recruiter comments go here -->
+                </div>
+              </div>
+
+              <!-- Stage 3: Hiring Manager Review -->
+              <div class="dashboard-card">
+                <h3 class="card-title">Stage 3: Hiring Manager Review</h3>
+                <div id="hiring-manager-review-findings">
+                  <!-- Dynamic hiring manager comments go here -->
+                </div>
+              </div>
+
+              <!-- Bullet Rewrites Section -->
+              <div class="dashboard-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                  <h3 class="card-title" style="margin: 0;">Experience Bullet Optimization</h3>
+                  <button id="btn-global-undo" class="btn btn-secondary btn-sm" type="button" disabled style="display: inline-flex; align-items: center; gap: 4px;">
+                    Undo Last Rewrite
+                  </button>
+                </div>
+                <p class="section-subtitle">Rewriting weak statements to use action verbs, owner mindsets, and impact slots without inventing unsupported facts.</p>
+                <div id="bullet-rewrites-container">
+                  <!-- Dynamic rewrite cards go here -->
+                </div>
+              </div>
+
+              <!-- Achievements & Certifications Vault Actions -->
+              <div class="dashboard-card">
+                <h3 class="card-title">Vault Match Recommendations</h3>
+                <p class="section-subtitle">AI recommendations to toggle credentials on or off based on target Job Description demands.</p>
+                <div id="vault-suggestions-container">
+                  <!-- Dynamic vault certification suggestions go here -->
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Cover Letter Studio Tab Panel -->
+        <div id="panel-coverletter" class="tab-panel-content" role="tabpanel" aria-labelledby="tab-coverletter" style="display: none; padding: 20px;">
+          <div class="dashboard-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <h3 class="card-title" style="margin: 0;">AI Cover Letter Drafter &amp; Reviewer</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                  Uses a dual-agent process: Agent 1 drafts from your resume &amp; target JD, Agent 2 reviews from a hiring manager's perspective.
+                </p>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <select id="coverletter-tone" class="form-control" style="width: auto; padding: 4px 8px; font-size: 0.8rem;">
+                  <option value="professional">Professional / Enterprise</option>
+                  <option value="conversational">Startup / Conversational</option>
+                  <option value="executive">Executive / Technical Lead</option>
+                </select>
+                <button id="btn-generate-coverletter" class="btn btn-primary btn-sm" type="button">
+                  Generate Cover Letter
+                </button>
+              </div>
+            </div>
+
+            <!-- Draft Output Area -->
+            <div id="coverletter-output-box" style="margin-top: 16px;">
+              <textarea id="coverletter-text" style="width: 100%; height: 340px; background-color: var(--card-bg); color: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 14px; font-family: sans-serif; font-size: 0.9rem; line-height: 1.6; resize: vertical;" placeholder="Click 'Generate Cover Letter' to draft a tailored letter matching your experience to the target Job Description..."></textarea>
+              <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                <button id="btn-copy-coverletter" class="btn btn-secondary btn-sm" type="button">
+                  Copy to Clipboard
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STAR Interview Prep Studio Tab Panel -->
+        <div id="panel-interview" class="tab-panel-content" role="tabpanel" aria-labelledby="tab-interview" style="display: none; padding: 20px;">
+          <div class="dashboard-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <h3 class="card-title" style="margin: 0;">STAR Interview Prep Studio</h3>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">
+                  Generates Situation, Task, Action, Result (STAR) interview stories matching your resume metrics to target JD requirements.
+                </p>
+              </div>
+              <button id="btn-generate-star" class="btn btn-primary btn-sm" type="button">
+                Generate STAR Q&amp;A Prep
+              </button>
+            </div>
+
+            <!-- STAR Prep Output Cards -->
+            <div id="star-prep-container" style="margin-top: 16px; display: flex; flex-direction: column; gap: 14px;">
+              <div class="stage-placeholder-banner">
+                <p>Click 'Generate STAR Q&amp;A Prep' to build tailored Situation-Task-Action-Result interview responses.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modals & Dialog overlays -->
+  
+  <!-- 1. Settings Dialog -->
+  <dialog id="settings-dialog" class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-dialog-title">
+    <div class="dialog-content">
+      <header class="dialog-header">
+        <h2 id="settings-dialog-title">Application Settings</h2>
+        <button class="dialog-close-btn" aria-label="Close settings">×</button>
+      </header>
+      
+      <div class="dialog-body">
+        <fieldset class="form-fieldset">
+          <legend class="fieldset-legend">Gemini API Credentials</legend>
+          <p class="settings-disclaimer">
+            **Gemini API key notice:** Use a current authorization key created in Google AI Studio. Google plans to stop accepting standard API keys in September 2026. Your key is sent directly from this browser to the Gemini API and may be visible through browser developer tools or extensions.
+          </p>
+          
+          <div class="form-group">
+            <label for="settings-api-key">Gemini API Key</label>
+            <input type="password" id="settings-api-key" placeholder="AIzaSy..." value="" autocomplete="current-password">
+            <span class="input-hint">The key is stored client-side according to your storage preference.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="settings-storage-pref">Key Storage Mode</label>
+            <select id="settings-storage-pref">
+              <option value="session">Use for this session only (sessionStorage)</option>
+              <option value="local">Remember on this device (localStorage with warning)</option>
+            </select>
+            <span class="input-hint warning-hint" id="local-storage-warning" style="display: none;">
+              ⚠️ Warning: Saving keys in localStorage makes them retrievable by scripting on this website. Do not use production keys.
+            </span>
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="settings-model">Gemini Model</label>
+            <select id="settings-model">
+              <option value="gemini-3.6-flash">Gemini 3.6 Flash (Fastest, High Performance)</option>
+              <option value="gemini-3.5-flash">Gemini 3.5 Flash (Balanced Speed & Accuracy)</option>
+              <option value="gemini-3.1-pro">Gemini 3.1 Pro (Deep Complex Reasoning)</option>
+            </select>
+            <span class="input-hint">Select the Gemini model version used for resume reviews and intelligent file imports.</span>
+          </div>
+
+          <div class="settings-actions">
+            <button id="btn-save-key" class="btn btn-primary btn-sm" type="button">Save API Key</button>
+            <button id="btn-clear-key" class="btn btn-secondary btn-sm" type="button">Clear Saved Key</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-fieldset">
+          <legend class="fieldset-legend">Document Format</legend>
+          <div class="form-group">
+            <label for="settings-paper-size">Export Paper Size</label>
+            <select id="settings-paper-size">
+              <option value="letter">US Letter (8.5" × 11")</option>
+              <option value="a4">A4 (210mm × 297mm)</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-fieldset">
+          <legend class="fieldset-legend">Backup & Restore</legend>
+          <p class="settings-disclaimer" style="background-color: hsla(142, 60%, 45%, 0.1); border-color: hsla(142, 60%, 45%, 0.3);">
+            Export your data to a JSON backup file, or restore a previously saved backup. The backup file explicitly excludes any API keys.
+          </p>
+          <div class="settings-actions">
+            <button id="btn-export-backup" class="btn btn-primary btn-sm" type="button">Export Backup</button>
+            <button id="btn-trigger-import" class="btn btn-secondary btn-sm" type="button">Import Backup</button>
+            <input type="file" id="import-file-input" accept=".json" style="display:none;" aria-hidden="true">
+          </div>
+        </fieldset>
+
+        <fieldset class="form-fieldset">
+          <legend class="fieldset-legend">Application Data Reset</legend>
+          <p class="reset-disclaimer">Perform selective clears or a full destructive factory reset. A confirmation dialog will prompt you before data is erased.</p>
+          <div class="settings-actions" style="flex-wrap: wrap;">
+            <button id="btn-clear-resume" class="btn btn-secondary btn-sm" type="button">Clear Resume Data</button>
+            <button id="btn-clear-analysis" class="btn btn-secondary btn-sm" type="button">Clear Analysis Results</button>
+            <button id="btn-clear-api-key" class="btn btn-secondary btn-sm" type="button">Clear API Key</button>
+            <button id="btn-reset-data" class="btn btn-danger btn-sm" type="button" style="width: 100%; margin-top: 8px;">Reset All Local Data</button>
+          </div>
+        </fieldset>
+      </div>
+      
+      <footer class="dialog-footer">
+        <button id="btn-settings-close" class="btn btn-secondary" type="button">Close</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- 2. Privacy Disclosure Dialog -->
+  <dialog id="privacy-dialog" class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="privacy-dialog-title">
+    <div class="dialog-content">
+      <header class="dialog-header">
+        <h2 id="privacy-dialog-title">Live AI Analysis Consent</h2>
+      </header>
+      
+      <div class="dialog-body">
+        <div class="privacy-alert-box">
+          <svg class="privacy-alert-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <h3>Important Privacy Disclosure</h3>
+        </div>
+        
+        <p class="privacy-text">
+          By continuing with Live AI Analysis, your resume text and target job description will be transmitted directly to the Google Gemini API. This data includes any personal contact info, career history, and credentials you have entered.
+        </p>
+        <p class="privacy-text">
+          Resume.AI is a browser-only application and does not operate its own backend database or server.
+        </p>
+        <p class="privacy-text font-bold">
+          If you wish to test Resume.AI privately without sending any data to external network servers, please click Cancel and use the Offline Demo Sandbox instead.
+        </p>
+      </div>
+      
+      <footer class="dialog-footer">
+        <button id="btn-privacy-confirm" class="btn btn-primary" type="button">I Consent, Proceed</button>
+        <button id="btn-privacy-cancel" class="btn btn-secondary" type="button">Cancel</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- 3. Raw Text Importer Dialog -->
+  <dialog id="import-text-dialog" class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="import-text-dialog-title">
+    <div class="dialog-content" style="max-width: 600px;">
+      <div class="dialog-header">
+        <h3 id="import-text-dialog-title">Import Existing Resume</h3>
+        <button class="dialog-close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+        Copy and paste the plain text of your existing resume (from PDF, Word, or plain text) into the field below. Choose a parsing strategy below.
+      </p>
+
+      <!-- Parsing Strategy -->
+      <fieldset style="border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; margin-bottom: 14px;">
+        <legend style="font-size: 0.8rem; font-weight: 600; padding: 0 6px;">Parsing Strategy</legend>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
+            <input type="radio" name="text-parse-strategy" value="local" id="text-parse-local" checked>
+            <span><strong>Parse Locally (Offline)</strong> — No API key required. Uses intelligent regex to extract sections.</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
+            <input type="radio" name="text-parse-strategy" value="gemini" id="text-parse-gemini">
+            <span><strong>Parse with Gemini AI</strong> — Requires a saved Gemini API key. More accurate for complex formats.</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="form-group">
+        <label for="import-raw-text">Paste Raw Resume Content</label>
+        <textarea id="import-raw-text" placeholder="John Doe&#10;Software Engineer...&#10;&#10;EXPERIENCE...&#10;Lead Developer at..." style="height: 250px; font-family: monospace; font-size: 0.85rem; color: #fff; background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px; width: 100%; box-sizing: border-box; resize: vertical;"></textarea>
+      </div>
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px;">
+        ⚠️ Local parsing is run offline and best-effort. Reading order for complex two-column or table-heavy resumes may be mixed.
+      </p>
+      <div class="dialog-footer" style="margin-top: 16px;">
+        <button id="btn-submit-import-text" class="btn btn-primary" type="button">Parse &amp; Populate Resume</button>
+        <button id="btn-cancel-import-text" class="btn btn-secondary" type="button">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 4. Upload Resume Dialog -->
+  <dialog id="upload-resume-dialog" class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="upload-dialog-title">
+    <div class="dialog-content" style="max-width: 600px;">
+      <div class="dialog-header">
+        <h3 id="upload-dialog-title">Upload Existing Resume</h3>
+        <button class="dialog-close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+      
+      <!-- File Drop Zone -->
+      <div id="drop-zone" class="upload-drop-zone" tabindex="0" role="button" aria-label="Drag and drop your resume file here or click to select from your device. Supported formats are PDF, DOCX, and TXT. Max size 5 MB.">
+        <div class="drop-zone-icon">📁</div>
+        <p class="drop-zone-text">Drag and drop your resume here <br> or <span class="browse-link" style="color: var(--primary-light); text-decoration: underline; font-weight: bold; cursor: pointer;">Choose File</span></p>
+        <p class="drop-zone-subtext">Supported formats: PDF, DOCX, TXT | Maximum size: 5 MB</p>
+        <input type="file" id="resume-file-input" accept=".pdf,.docx,.txt" style="display: none;">
+      </div>
+
+      <!-- File Status & Extracted Text Preview -->
+      <div id="upload-preview-section" style="display: none; margin-top: 16px;">
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Extracted Text Preview</h4>
+        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 600;">
+          File: <span id="lbl-file-name" style="color: var(--primary-light);">filename.pdf</span> (<span id="lbl-file-size">1.2MB</span>)
+        </div>
+        <textarea id="txt-extracted-preview" readonly style="height: 150px; font-family: monospace; font-size: 0.75rem; background-color: var(--background); border: 1px solid var(--border); color: #fff; width: 100%; box-sizing: border-box; padding: 8px; resize: none;"></textarea>
+        
+        <!-- Parsing Selection -->
+        <div class="form-group" style="margin-top: 16px;">
+          <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 8px;">Select Parsing Strategy</label>
+          <div style="display: flex; gap: 16px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem;">
+              <input type="radio" name="parse-strategy" value="local" checked>
+              Parse Locally (100% Offline, Private)
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem;">
+              <input type="radio" name="parse-strategy" value="gemini">
+              Parse with Gemini AI (Live Mode API Key required)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress indicator -->
+      <div id="import-progress-container" style="display: none; margin-top: 16px; text-align: center;">
+        <div class="import-spinner" style="display: inline-block; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--primary-light); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 8px;"></div>
+        <p id="lbl-import-status" aria-live="polite" style="font-size: 0.85rem; color: var(--primary-light); margin: 0;">Extracting document text...</p>
+      </div>
+
+      <div class="dialog-footer" style="margin-top: 20px;">
+        <button id="btn-upload-continue" class="btn btn-primary" type="button" disabled>Continue to Review</button>
+        <button id="btn-upload-cancel" class="btn btn-secondary" type="button">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 5. Import Review Dialog -->
+  <dialog id="import-review-dialog" class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="review-dialog-title">
+    <div class="dialog-content" style="max-width: 700px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="dialog-header">
+        <h3 id="review-dialog-title">Import Review</h3>
+        <button class="dialog-close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="dialog-body-scrollable" style="flex: 1; overflow-y: auto; padding-right: 8px; margin-top: 12px; margin-bottom: 12px; max-height: 55vh;">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+          Select which parts of the parsed resume you want to import into your workspace. You can edit the field inputs directly.
+        </p>
+
+        <!-- Warnings Banner -->
+        <div id="import-warnings-banner" class="alert-box-warning" style="display: none; margin-bottom: 16px; background-color: rgba(230, 126, 34, 0.15); border: 1px solid var(--warning); border-radius: 4px; padding: 10px;">
+          <strong style="color: var(--warning); font-size: 0.85rem;">Import Warnings:</strong>
+          <ul id="import-warnings-list" style="margin: 8px 0 0 16px; padding: 0; font-size: 0.8rem; color: var(--text-secondary);"></ul>
+        </div>
+
+        <!-- Review Sections -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Section: Contact -->
+          <fieldset class="form-fieldset">
+            <legend class="fieldset-legend" style="display: flex; align-items: center; gap: 8px; float: none; width: auto; padding: 0 8px; margin: 0;">
+              <input type="checkbox" id="chk-import-contact" checked>
+              Contact Information
+            </legend>
+            <div id="preview-import-contact" class="form-grid" style="margin-top: 12px;"></div>
+          </fieldset>
+
+          <!-- Section: Summary -->
+          <fieldset class="form-fieldset">
+            <legend class="fieldset-legend" style="display: flex; align-items: center; gap: 8px; float: none; width: auto; padding: 0 8px; margin: 0;">
+              <input type="checkbox" id="chk-import-summary" checked>
+              Professional Summary
+            </legend>
+            <div style="margin-top: 12px; width: 100%;">
+              <textarea id="preview-import-summary" style="width: 100%; height: 100px; background-color: var(--card-bg); color: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 8px; box-sizing: border-box; resize: vertical;"></textarea>
+            </div>
+          </fieldset>
+
+          <!-- Section: Experience -->
+          <fieldset class="form-fieldset">
+            <legend class="fieldset-legend" style="display: flex; align-items: center; gap: 8px; float: none; width: auto; padding: 0 8px; margin: 0;">
+              <input type="checkbox" id="chk-import-experience" checked>
+              Work Experience
+            </legend>
+            <div id="preview-import-experience" style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px; width: 100%;"></div>
+          </fieldset>
+
+          <!-- Section: Education -->
+          <fieldset class="form-fieldset">
+            <legend class="fieldset-legend" style="display: flex; align-items: center; gap: 8px; float: none; width: auto; padding: 0 8px; margin: 0;">
+              <input type="checkbox" id="chk-import-education" checked>
+              Education History
+            </legend>
+            <div id="preview-import-education" style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px; width: 100%;"></div>
+          </fieldset>
+
+          <!-- Section: Skills -->
+          <fieldset class="form-fieldset">
+            <legend class="fieldset-legend" style="display: flex; align-items: center; gap: 8px; float: none; width: auto; padding: 0 8px; margin: 0;">
+              <input type="checkbox" id="chk-import-skills" checked>
+              Skills
+            </legend>
+            <div class="form-grid" style="margin-top: 12px;">
+              <div class="form-group">
+                <label>Technical Skills (Comma separated)</label>
+                <input type="text" id="preview-import-skills-tech" style="background-color: var(--card-bg); color: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 8px; width: 100%; box-sizing: border-box;">
+              </div>
+              <div class="form-group">
+                <label>Tools & Platforms (Comma separated)</label>
+                <input type="text" id="preview-import-skills-tools" style="background-color: var(--card-bg); color: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 8px; width: 100%; box-sizing: border-box;">
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Section: Vault -->
+          <fieldset class="form-fieldset">
+            <legend class="fieldset-legend" style="display: flex; align-items: center; gap: 8px; float: none; width: auto; padding: 0 8px; margin: 0;">
+              <input type="checkbox" id="chk-import-vault" checked>
+              Certifications & Vault Items
+            </legend>
+            <div id="preview-import-vault" style="margin-top: 12px; display: flex; flex-direction: column; gap: 12px; width: 100%;"></div>
+          </fieldset>
+        </div>
+      </div>
+
+      <!-- Import Strategy & Summary -->
+      <div style="border-top: 1px solid var(--border); padding-top: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <label style="font-size: 0.85rem; font-weight: 600; display: block; margin-bottom: 4px;">Choose Import Strategy</label>
+            <div style="display: flex; gap: 16px;">
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem;">
+                <input type="radio" name="import-strategy" value="replace" checked>
+                Replace Current Resume
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.85rem;">
+                <input type="radio" name="import-strategy" value="merge">
+                Merge With Current Resume
+              </label>
+            </div>
+          </div>
+          <!-- Dynamic Import Summary Box -->
+          <div id="import-summary-summary" style="background-color: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 4px; font-size: 0.75rem; border: 1px solid var(--border); max-width: 350px;">
+            <strong>Import Summary:</strong>
+            <div id="lbl-summary-counts" style="margin-top: 4px; color: var(--text-secondary);">No sections selected.</div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">
+          No changes have been applied to your active resume workspace yet. Confirming will backup your current state and apply the import.
+        </p>
+
+        <div class="dialog-footer">
+          <button id="btn-import-confirm" class="btn btn-primary" type="button">Confirm & Import</button>
+          <button id="btn-import-review-cancel" class="btn btn-secondary" type="button">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 4. GitHub Scraper Dialog -->
+  <dialog id="github-scraper-dialog" class="app-dialog" role="dialog" aria-modal="true" aria-labelledby="github-scraper-dialog-title">
+    <div class="dialog-content" style="max-width: 500px;">
+      <div class="dialog-header">
+        <h3 id="github-scraper-dialog-title">Import GitHub Competencies</h3>
+        <button class="dialog-close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="dialog-body">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 14px;">
+          Fetch public repositories, primary programming languages, and project topics directly from your public GitHub profile.
+        </p>
+        <div class="form-group">
+          <label for="github-username-input">GitHub Username or Profile URL</label>
+          <input type="text" id="github-username-input" placeholder="e.g. vivekmed18 or https://github.com/vivekmed18" style="width: 100%; box-sizing: border-box;">
+        </div>
+      </div>
+      <div class="dialog-footer">
+        <button id="btn-fetch-github-data" class="btn btn-primary" type="button">Fetch Competencies</button>
+        <button id="btn-cancel-github-dialog" class="btn btn-secondary" type="button">Cancel</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification System (Offline placeholders) -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="vendor/pdf.min.js"></script>
+  <script src="vendor/mammoth.browser.min.js"></script>
+  <script src="file-extractor.js?v=4.2"></script>
+  <script src="resume-parser.js?v=4.2"></script>
+  <script src="mockData.js?v=4.2"></script>
+  <script src="config.js?v=4.2"></script>
+  <script src="analyzer.js?v=4.2"></script>
+  <script src="app.js?v=4.2"></script>
+  <script src="agentation-visual.js?v=1.0"></script>
+</body>
+</html>

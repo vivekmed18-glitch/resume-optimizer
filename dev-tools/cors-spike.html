@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume.AI - Gemini CORS & API Spike Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0f121d;
+      color: #e2e8f0;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #a855f7;
+      margin-bottom: 24px;
+    }
+    .card {
+      background-color: #171d30;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background-color: #0f121d;
+      color: #fff;
+      box-sizing: border-box;
+      margin-bottom: 16px;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #a855f7;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 12px;
+      margin-bottom: 12px;
+    }
+    button:hover {
+      background-color: #9333ea;
+    }
+    .secondary-btn {
+      background-color: #3b4252;
+    }
+    .secondary-btn:hover {
+      background-color: #4c566a;
+    }
+    pre {
+      background-color: #0f121d;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.875rem;
+      max-height: 400px;
+    }
+    .success {
+      color: #2ecc71;
+    }
+    .error {
+      color: #e74c3c;
+    }
+    .warning {
+      color: #f39c12;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gemini CORS & API Connection Spike</h1>
+  <p>Use this utility to test direct browser connection to the Gemini API, verify API key authentication headers, and audit request timeouts or cancellations.</p>
+
+  <div class="card">
+    <label for="spike-api-key">Gemini API Key</label>
+    <input type="password" id="spike-api-key" placeholder="AIzaSy..." value="">
+    
+    <button id="btn-run-spike">Test Connection (x-goog-api-key)</button>
+    <button id="btn-trigger-timeout" class="secondary-btn">Test Timeout (3s abort)</button>
+    <button id="btn-trigger-cancel" class="secondary-btn">Test Cancel / Abort</button>
+  </div>
+
+  <div class="card">
+    <label>Connection Logs & Response Status</label>
+    <pre id="spike-output">Waiting for user input...</pre>
+  </div>
+
+  <script>
+    const output = document.getElementById("spike-output");
+    let activeController = null;
+
+    function log(message, className = "") {
+      const span = document.createElement("span");
+      span.className = className;
+      span.textContent = `[${new Date().toLocaleTimeString()}] ${message}\n`;
+      output.appendChild(span);
+      // scroll to bottom
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function clearLog() {
+      output.innerHTML = "";
+    }
+
+    async function makeApiCall(apiKey, timeoutMs = 15000) {
+      const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
+      
+      activeController = new AbortController();
+      const signal = activeController.signal;
+
+      const timeoutId = setTimeout(() => {
+        if (activeController) {
+          log(`Request exceeded timeout limit of ${timeoutMs}ms. Aborting...`, "warning");
+          activeController.abort();
+        }
+      }, timeoutMs);
+
+      const requestBody = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: "Respond in exactly one short sentence: 'Connection Successful!'" }
+            ]
+          }
+        ]
+      };
+
+      try {
+        log(`Initiating fetch request to Gemini API (generateContent)...`);
+        log(`Origin: ${window.location.origin || 'file://'}`);
+        log(`Method: POST, Header: x-goog-api-key`);
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey
+          },
+          body: JSON.stringify(requestBody),
+          signal: signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(`HTTP Error ${response.status}: ${errText}`);
+        }
+
+        const data = await response.json();
+        log(`Response Status: ${response.status} OK`, "success");
+        log(`JSON Data Payload: \n${JSON.stringify(data, null, 2)}`, "success");
+
+        const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || "No text returned.";
+        log(`Gemini Text Output: "${textResponse.trim()}"`, "success");
+
+      } catch (err) {
+        clearTimeout(timeoutId);
+        if (err.name === "AbortError") {
+          log(`Fetch aborted successfully (reason: timeout or cancel)`, "warning");
+        } else {
+          log(`API Call Failed: ${err.message}`, "error");
+        }
+      } finally {
+        activeController = null;
+      }
+    }
+
+    document.getElementById("btn-run-spike").addEventListener("click", () => {
+      clearLog();
+      const key = document.getElementById("spike-api-key").value.trim();
+      if (!key) {
+        log("Error: Please paste an API key first.", "error");
+        return;
+      }
+      makeApiCall(key);
+    });
+
+    document.getElementById("btn-trigger-timeout").addEventListener("click", () => {
+      clearLog();
+      const key = document.getElementById("spike-api-key").value.trim();
+      if (!key) {
+        log("Error: Please paste an API key first.", "error");
+        return;
+      }
+      log("Starting test with a short 2-second timeout...", "warning");
+      makeApiCall(key, 2000); // 2 seconds to force timeout
+    });
+
+    document.getElementById("btn-trigger-cancel").addEventListener("click", () => {
+      clearLog();
+      const key = document.getElementById("spike-api-key").value.trim();
+      if (!key) {
+        log("Error: Please paste an API key first.", "error");
+        return;
+      }
+
+      log("Initiating request and immediate cancel sequence...");
+      makeApiCall(key);
+
+      // Cancel immediately
+      setTimeout(() => {
+        if (activeController) {
+          log("Immediate cancellation button pressed. Aborting active request...");
+          activeController.abort();
+        } else {
+          log("No active request to cancel.");
+        }
+      }, 50);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Local secrets & configs
+config.js
+*.env
+*.key
+
+# Temporary artifacts
+search_results.json
+scratch/
+test-scripts/
+node_modules/
