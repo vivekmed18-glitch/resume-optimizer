@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initMobileTabs();
   initModals();
   initHeatmap();
+  initPreviewZoomControls();
   initPlaceholderActions();
   initFormChangeDelegation();
   initBackupActions();
@@ -3061,6 +3062,63 @@ function initHeatmap() {
       }
     });
   }
+}
+
+/**
+ * Resume Preview Zoom & Sizing Controls
+ */
+function initPreviewZoomControls() {
+  const container = document.querySelector(".resume-sheet-container");
+  const panel = document.getElementById("panel-preview");
+  const btnZoomIn = document.getElementById("btn-zoom-in");
+  const btnZoomOut = document.getElementById("btn-zoom-out");
+  const btnZoomFit = document.getElementById("btn-zoom-fit");
+  const btnZoomReset = document.getElementById("btn-zoom-reset");
+  const lblZoom = document.getElementById("lbl-zoom-level");
+
+  if (!container || !lblZoom) return;
+
+  let currentScale = 0.9;
+
+  function applyZoom(scale) {
+    currentScale = Math.min(1.5, Math.max(0.4, Math.round(scale * 100) / 100));
+    container.style.transform = `scale(${currentScale})`;
+    container.style.transformOrigin = "top center";
+    lblZoom.textContent = `${Math.round(currentScale * 100)}%`;
+  }
+
+  if (btnZoomIn) {
+    btnZoomIn.addEventListener("click", () => {
+      applyZoom(currentScale + 0.1);
+    });
+  }
+
+  if (btnZoomOut) {
+    btnZoomOut.addEventListener("click", () => {
+      applyZoom(currentScale - 0.1);
+    });
+  }
+
+  if (btnZoomReset) {
+    btnZoomReset.addEventListener("click", () => {
+      applyZoom(1.0);
+    });
+  }
+
+  if (btnZoomFit) {
+    btnZoomFit.addEventListener("click", () => {
+      if (!panel || !container) return;
+      const availableWidth = panel.clientWidth - 48;
+      const sheetWidth = container.offsetWidth || 816;
+      if (sheetWidth > 0 && availableWidth > 0) {
+        const fitScale = availableWidth / sheetWidth;
+        applyZoom(fitScale);
+      }
+    });
+  }
+
+  // Initial apply
+  applyZoom(currentScale);
 }
 
 /**
